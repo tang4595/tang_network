@@ -1,9 +1,16 @@
+import 'package:tang_network/http/tang_network_http.dart';
+
 /// Configuration.
 abstract class NetworkHttpConfig {
+  /// Basic.
   late String apiDomain;
   late NetworkHttpBase base;
   late NetworkHttpKeys keys;
   late NetworkHttpCodes codes;
+
+  /// Interaction.
+  NetworkHttpGetters? getters;
+  NetworkHttpCallbacks? callbacks;
 }
 
 /// Base.
@@ -26,4 +33,17 @@ abstract class NetworkHttpCodes {
   late int success;
   late String tokenExpired;
   late String lowVersion;
+}
+
+/// Getter.
+abstract class NetworkHttpGetters {
+  String? getUserToken(NetworkHttp networkHttp);
+}
+
+/// Callback.
+abstract class NetworkHttpCallbacks {
+  handleInfoMessage(NetworkHttp networkHttp, String message);
+  handleErrorMessage(NetworkHttp networkHttp, String message, bool isIgnored);
+  handleTokenExpiredAction(NetworkHttp networkHttp, dynamic context);
+  handleUpdatesAction(NetworkHttp networkHttp, dynamic context);
 }

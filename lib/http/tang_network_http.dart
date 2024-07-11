@@ -5,14 +5,13 @@ import 'dart:io';
 import 'dart:async';
 import 'package:flutter_udid/flutter_udid.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
-import 'package:ss_user/actor/ss_user_actor.dart';
+import 'package:tang_network/util/tang_network_util.dart';
 import 'package:tang_network/config/tang_network_config.dart';
-import 'package:tang_util/tang_util.dart';
 import 'package:flutter/foundation.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:encrypt/encrypt.dart' as ec;
 
-/// 后期重构点: 拆分Query请求描述、拦截器外置abstract扩展.
+//TODO: 拆分Query请求描述、拦截器外置abstract扩展
 
 enum NetworkMethodType {
   post, get
@@ -183,8 +182,8 @@ extension CommonEx on NetworkHttp {
     var headers = {
       HttpHeaders.contentTypeHeader: 'application/json;charset=UTF-8',
       // 'AUTH-TOKEN': token,
-      // 'SIG': sig,
-      'Authorization': SSUserActor.shared.token ?? '',
+      // 'SIG': sig, //TODO: util interceptor
+      'Authorization': _config.getters?.getUserToken(this) ?? '',
     };
     headers.addAll(customHeaders ?? {});
     if (needsAutoSetupDeviceInfo) {
@@ -228,7 +227,7 @@ extension CommonEx on NetworkHttp {
       );
     }
     if (isSimpleResponse) {
-      _showErrorToastIfNeeded(response.data ?? {});
+      _handleErrorResponse(response.data ?? {});
       return Future<Map<String, dynamic>>.value(response.data);
     }
 
@@ -251,21 +250,25 @@ extension CommonEx on NetworkHttp {
       response: response,
       completer: completer,
     );
-    _showErrorToastIfNeeded(plainResponse, ignoreErrorCodes: ignoreErrorCodes);
+    _handleErrorResponse(plainResponse, ignoreErrorCodes: ignoreErrorCodes);
     return plainResponse;
   }
 
-  /// 通用错误码提示.
-  _showErrorToastIfNeeded(Map<String, dynamic> response, {
+  /// Error handling.
+  _handleErrorResponse(Map<String, dynamic> response, {
     List<String>? ignoreErrorCodes,
   }) {
     var code = response[_config.keys.responseCode];
     if (code == null) return;
 
     bool ignoreError = ignoreErrorCodes?.contains(code) ?? false;
-    if (_config.codes.success != code && !ignoreError) {
-      Toast.info(response[_config.keys.responseMsg]?.toString()
-          ?? '未知错误，请稍后重试');
+    if (_config.codes.success == code) return;
+    if (ignoreError) {
+      _config.callbacks?.handleErrorMessage(this, code.toString(), true);
+    } else {
+      final errMsg = response[_config.keys.responseMsg]?.toString()
+          ?? '未知错误，请稍后重试';
+      _config.callbacks?.handleErrorMessage(this, errMsg, true);
     }
   }
 }
@@ -332,7 +335,7 @@ extension UploadEx on NetworkHttp {
 
 extension DownloadEx on NetworkHttp {
 
-  /// 下载文件.
+  /// File download.
   ///
   /// - [url] .
   /// - [savePath] The path to save the downloaded file.
@@ -389,10 +392,9 @@ extension _ParseEx on NetworkHttp {
     dynamic respCode = responseDataObj[_config.keys.responseCode];
     if (respCode is String) {
       if (respCode == _config.codes.tokenExpired) {
-        // UserService.shared.setUser(null);
-        Navigation.navigationEventBus.fire(TokenExpiredEvent());
+        _config.callbacks?.handleTokenExpiredAction(this, responseDataObj);
       } else if (respCode == _config.codes.lowVersion) {
-        //ConfigService.shared.setHasUpdate(true);//todo:更新拦截
+        _config.callbacks?.handleUpdatesAction(this, responseDataObj);
       }
     }
 

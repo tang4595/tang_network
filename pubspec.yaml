@@ -19,16 +19,6 @@ dependencies:
   flutter_udid: ^3.0.0
   device_info_plus: ^10.1.0
 
-  # Base
-  tang_appbase:
-    git: https://github.com/tang4595/tang_appbase.git
-  tang_util:
-    git: https://github.com/tang4595/tang_util.git
-
-  # Business
-  ss_user:
-    path: ../../module/ss_user
-
 dev_dependencies:
   flutter_test:
     sdk: flutter
