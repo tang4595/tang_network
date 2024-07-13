@@ -36,7 +36,8 @@ class NetworkHttp {
 
   final Dio dio = Dio();
   late NetworkHttpConfig _config;
-  String? _deviceModel, _deviceId, _version;
+  String? _version, _deviceId, _deviceModel, _deviceBrand, _deviceDisplay,
+      _deviceHardware;
   
   /// Json.
   final jsonEncoder = const JsonEncoder();
@@ -77,9 +78,12 @@ class NetworkHttp {
           RequestOptions options,
           RequestInterceptorHandler handler) async {
         await _setupDeviceInfoIfNeeded(options.headers);
+        options.headers['DID'] = _deviceId;
         options.headers['DSOURCE'] = (Platform.isIOS ? 'ios':'android');
         options.headers['DMODEL'] = _deviceModel;
-        options.headers['DID'] = _deviceId;
+        options.headers['DBRAND'] = _deviceBrand;
+        options.headers['DDISPLAY'] = _deviceDisplay;
+        options.headers['DHARDWARE'] = _deviceHardware;
         options.headers['LANG'] = 'zh';
         options.headers['APP-VERSION'] = _version;
         options.headers['version'] = _version;
@@ -114,9 +118,15 @@ class NetworkHttp {
     final dm = Platform.isIOS
         ? (await dip.iosInfo).utsname.machine
         : (await dip.androidInfo).model;
-    _deviceModel = dm;
-    _deviceId ??= await FlutterUdid.udid;
+    final brand = Platform.isIOS ? 'Apple' : (await dip.androidInfo).brand;
+    final display = Platform.isIOS ? 'Apple' : (await dip.androidInfo).display;
+    final hardware = Platform.isIOS ? 'Apple' : (await dip.androidInfo).hardware;
     _version = (await PackageInfo.fromPlatform()).version;
+    _deviceId ??= await FlutterUdid.udid;
+    _deviceModel = dm;
+    _deviceBrand = brand;
+    _deviceDisplay = display;
+    _deviceHardware = hardware;
   }
 }
 
@@ -124,9 +134,12 @@ class NetworkHttp {
 
 extension GettersEx on NetworkHttp {
   NetworkHttpConfig get config => _config;
-  String get deviceModel => _deviceModel ?? 'Simulator';
-  String get deviceId => _deviceId ?? '';
   String get version => _version ?? '';
+  String get deviceId => _deviceId ?? '';
+  String get deviceModel => _deviceModel ?? 'Simulator';
+  String get deviceBrand => _deviceBrand ?? '';
+  String get deviceDisplay => _deviceDisplay ?? '';
+  String get deviceHardware => _deviceHardware ?? '';
 }
 
 // POST / GET
