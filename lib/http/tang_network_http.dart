@@ -112,7 +112,10 @@ class NetworkHttp {
 
   /// Initializing.
   initDeviceInfo() {
-    _setupDeviceInfoIfNeeded({});
+    final param = {
+      _kURLExtraParamNeedsAutoSetupDeviceInfo: _kURLExtraParamValue,
+    };
+    _setupDeviceInfoIfNeeded(param);
   }
 
   /// Device info setup.
