@@ -110,6 +110,11 @@ class NetworkHttp {
     }
   }
 
+  /// Initializing.
+  initDeviceInfo() {
+    _setupDeviceInfoIfNeeded({});
+  }
+
   /// Device info setup.
   _setupDeviceInfoIfNeeded(Map<String, dynamic> headers) async {
     if (_deviceModel != null && _deviceId != null && _version != null) return;
