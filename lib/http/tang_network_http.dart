@@ -87,9 +87,7 @@ class NetworkHttp {
         responseHeader: !kReleaseMode,
         compact: true,
       ))
-      ..add(InterceptorsWrapper(onRequest: (
-          RequestOptions options,
-          RequestInterceptorHandler handler) async {
+      ..add(InterceptorsWrapper(onRequest: (options, handler) async {
         await _setupDeviceInfoIfNeeded(options.headers);
         options.headers['DID'] = _deviceId;
         options.headers['DSOURCE'] = (Platform.isIOS ? 'ios':'android');
@@ -102,9 +100,9 @@ class NetworkHttp {
         options.headers['APP-BUILD'] = _buildNo;
         options.headers['version'] = _version;
         handler.next(options);
-      }, onResponse: (Response response, ResponseInterceptorHandler handler) {
+      }, onResponse: (response, handler) {
         handler.next(response);
-      }, onError: (DioException exception, ErrorInterceptorHandler handler) {
+      }, onError: (exception, handler) {
         handler.next(exception);
       }));
 
