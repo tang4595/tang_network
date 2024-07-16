@@ -8,16 +8,18 @@ name: Publish to pub.dev
 ##     #   working-directory: path/to/sub/directory
 
 on:
-  workflow_call:
-    inputs:
-      environment:
-        description: if specified, the workflow is required to be run in this environment (with additional approvals)
-        required: false
-        type: string
-      working-directory:
-        description: directory with-in the repository where the package is located (if not in the repository root)
-        required: false
-        type: string
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+*'
+  inputs:
+    environment:
+      description: if specified, the workflow is required to be run in this environment (with additional approvals)
+      required: false
+      type: string
+    working-directory:
+      description: directory with-in the repository where the package is located (if not in the repository root)
+      required: false
+      type: string
 
 jobs:
   publish:
