@@ -15,7 +15,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: dart-lang/setup-dart@v1
-      
       - name: Set up Flutter Env
         uses: subosito/flutter-action@v2
         with:
@@ -23,7 +22,6 @@ jobs:
           flutter-version: 3.19.4
       - name: The Flutter Env
       - run: flutter --version
-      
       - name: Install dependencies
         run: flutter pub get
       # Here you can insert custom steps you need
