@@ -43,7 +43,7 @@ abstract class NetworkHttpGetters {
 
 /// Callback.
 abstract class NetworkHttpCallbacks {
-  handleOnDioSetup(Dio dio, bool beforeBasicInit);
+  onDioSetup(Dio dio, bool beforeBasicInit);
   handleInfoMessage(NetworkHttp networkHttp, String message);
   handleErrorMessage(NetworkHttp networkHttp, String message, bool isIgnored);
   handleTokenExpiredAction(NetworkHttp networkHttp, dynamic context);

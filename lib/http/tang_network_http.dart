@@ -11,7 +11,7 @@ import 'package:flutter/foundation.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:encrypt/encrypt.dart' as ec;
 
-/// Proxy usage.
+/// Proxy usage sample.
 /// if (kDebugMode) {
 ///   (_dio.httpClientAdapter as IOHttpClientAdapter).createHttpClient = () {
 ///     const proxy = '192.168.199.66:9090';
@@ -22,8 +22,6 @@ import 'package:encrypt/encrypt.dart' as ec;
 ///     return client;
 ///   };
 /// }
-
-//TODO: 拆分Query请求描述、拦截器外置abstract扩展
 
 enum NetworkMethodType {
   post, get
@@ -48,6 +46,8 @@ class NetworkHttp {
 
   final Dio _dio = Dio();
   late NetworkHttpConfig _config;
+
+  /// Package info.
   String? _version, _buildNo, _deviceId, _deviceModel, _deviceBrand,
       _deviceDisplay, _deviceHardware;
   
@@ -68,7 +68,7 @@ class NetworkHttp {
   /// Setup.
   setup({required NetworkHttpConfig config}) async {
     _config = config;
-    _config.callbacks?.handleOnDioSetup(_dio, true);
+    _config.callbacks?.onDioSetup(_dio, true);
 
     /// Basic.
     _dio.options.connectTimeout = Duration(
@@ -107,7 +107,7 @@ class NetworkHttp {
       }));
 
     /// Configuration callback.
-    _config.callbacks?.handleOnDioSetup(_dio, false);
+    _config.callbacks?.onDioSetup(_dio, false);
   }
 
   /// Initializing.
