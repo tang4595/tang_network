@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:tang_network/http/tang_network_http.dart';
 
 /// Configuration.
@@ -42,6 +43,7 @@ abstract class NetworkHttpGetters {
 
 /// Callback.
 abstract class NetworkHttpCallbacks {
+  handleOnDioSetup(Dio dio, bool beforeBasicInit);
   handleInfoMessage(NetworkHttp networkHttp, String message);
   handleErrorMessage(NetworkHttp networkHttp, String message, bool isIgnored);
   handleTokenExpiredAction(NetworkHttp networkHttp, dynamic context);

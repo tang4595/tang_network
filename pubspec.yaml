@@ -1,6 +1,6 @@
 name: tang_network
 description: "The util of HTTP Network implements on the Flutter platform."
-version: 0.0.1
+version: 0.0.2
 homepage: https://github.com/tang4595/tang_network.git
 repository: https://github.com/tang4595/tang_network
 issue_tracker: https://github.com/tang4595/tang_network/issues

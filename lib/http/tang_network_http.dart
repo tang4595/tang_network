@@ -11,6 +11,18 @@ import 'package:flutter/foundation.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:encrypt/encrypt.dart' as ec;
 
+/// Proxy usage.
+/// if (kDebugMode) {
+///   (_dio.httpClientAdapter as IOHttpClientAdapter).createHttpClient = () {
+///     const proxy = '192.168.199.66:9090';
+///     final client = HttpClient();
+///     client.findProxy = (url) { return 'PROXY $proxy'; };
+///     client.badCertificateCallback =
+///     (X509Certificate cert, String host, int port) => Platform.isAndroid;
+///     return client;
+///   };
+/// }
+
 //TODO: 拆分Query请求描述、拦截器外置abstract扩展
 
 enum NetworkMethodType {
@@ -34,10 +46,10 @@ class NetworkHttp {
     /// init...
   }
 
-  final Dio dio = Dio();
+  final Dio _dio = Dio();
   late NetworkHttpConfig _config;
-  String? _version, _deviceId, _deviceModel, _deviceBrand, _deviceDisplay,
-      _deviceHardware;
+  String? _version, _buildNo, _deviceId, _deviceModel, _deviceBrand,
+      _deviceDisplay, _deviceHardware;
   
   /// Json.
   final jsonEncoder = const JsonEncoder();
@@ -56,17 +68,18 @@ class NetworkHttp {
   /// Setup.
   setup({required NetworkHttpConfig config}) async {
     _config = config;
+    _config.callbacks?.handleOnDioSetup(_dio, true);
 
     /// Basic.
-    dio.options.connectTimeout = Duration(
+    _dio.options.connectTimeout = Duration(
       milliseconds: config.base.connectionTimeoutMs,
     );
-    dio.options.receiveTimeout = Duration(
+    _dio.options.receiveTimeout = Duration(
       milliseconds: config.base.receiveTimeoutMs,
     );
 
     /// Headers.
-    dio.interceptors
+    _dio.interceptors
       ..add(PrettyDioLogger(
         requestHeader: !kReleaseMode,
         requestBody: !kReleaseMode,
@@ -86,6 +99,7 @@ class NetworkHttp {
         options.headers['DHARDWARE'] = _deviceHardware;
         options.headers['LANG'] = 'zh';
         options.headers['APP-VERSION'] = _version;
+        options.headers['APP-BUILD'] = _buildNo;
         options.headers['version'] = _version;
         handler.next(options);
       }, onResponse: (Response response, ResponseInterceptorHandler handler) {
@@ -94,25 +108,13 @@ class NetworkHttp {
         handler.next(exception);
       }));
 
-    /// Proxy.
-    if (kDebugMode) {
-      // (dio.httpClientAdapter as IOHttpClientAdapter).createHttpClient = () {
-      //   final isAndroid = Platform.isAndroid;
-      //   String proxy = isAndroid
-      //       ? '192.168.199.66:9090'
-      //       : '192.168.199.166:9090';
-      //   final client = HttpClient();
-      //   client.findProxy = (url) { return 'PROXY $proxy'; };
-      //   client.badCertificateCallback =
-      //       (X509Certificate cert, String host, int port) => isAndroid;
-      //   return client;
-      // };
-    }
+    /// Configuration callback.
+    _config.callbacks?.handleOnDioSetup(_dio, false);
   }
 
   /// Initializing.
   initDeviceInfo() {
-    final param = {
+    final Map<String, dynamic> param = {
       _kURLExtraParamNeedsAutoSetupDeviceInfo: _kURLExtraParamValue,
     };
     _setupDeviceInfoIfNeeded(param);
@@ -122,6 +124,7 @@ class NetworkHttp {
   _setupDeviceInfoIfNeeded(Map<String, dynamic> headers) async {
     if (_deviceModel != null && _deviceId != null && _version != null) return;
     if (headers[_kURLExtraParamNeedsAutoSetupDeviceInfo] != _kURLExtraParamValue) return;
+    final platform = await PackageInfo.fromPlatform();
     final dip = DeviceInfoPlugin();
     final dm = Platform.isIOS
         ? (await dip.iosInfo).utsname.machine
@@ -129,7 +132,8 @@ class NetworkHttp {
     final brand = Platform.isIOS ? 'Apple' : (await dip.androidInfo).brand;
     final display = Platform.isIOS ? 'Apple' : (await dip.androidInfo).display;
     final hardware = Platform.isIOS ? 'Apple' : (await dip.androidInfo).hardware;
-    _version = (await PackageInfo.fromPlatform()).version;
+    _version = platform.version;
+    _buildNo = platform.buildNumber;
     _deviceId ??= await FlutterUdid.udid;
     _deviceModel = dm;
     _deviceBrand = brand;
@@ -141,8 +145,10 @@ class NetworkHttp {
 // Getter
 
 extension GettersEx on NetworkHttp {
+  Dio get dio => _dio;
   NetworkHttpConfig get config => _config;
   String get version => _version ?? '';
+  String get buildNo => _buildNo ?? '';
   String get deviceId => _deviceId ?? '';
   String get deviceModel => _deviceModel ?? 'Simulator';
   String get deviceBrand => _deviceBrand ?? '';
@@ -216,14 +222,14 @@ extension CommonEx on NetworkHttp {
     Response<Map<String, dynamic>> response;
     switch (method) {
       case NetworkMethodType.get:
-        response = await dio.get(
+        response = await _dio.get(
           url,
           // data: encryptedParams,
           data: params,
           options: options,
         );
       case NetworkMethodType.post:
-        response = await dio.post(
+        response = await _dio.post(
           url,
           // data: encryptedParams,
           data: params,
@@ -333,7 +339,7 @@ extension UploadEx on NetworkHttp {
     /// Do request.
     url = _config.apiDomain + url;
     final data = FormData.fromMap(parameters);
-    final response = await dio.post(
+    final response = await _dio.post(
       url,
       data: data,
       onSendProgress: onSendProgress,
@@ -363,7 +369,7 @@ extension DownloadEx on NetworkHttp {
   Future<File> download(String url, String savePath) async {
     final completer = Completer<File>();
     url = _config.apiDomain + url;
-    dio.download(
+    _dio.download(
       url,
       savePath,
       options: Options(responseType: ResponseType.stream),
