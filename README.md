@@ -19,7 +19,7 @@ dependencies:
 
 #### Setup
 
-- Implements the configurations for your project,
+- Implementing the configurations for your project,
 ```dart
 /// Configuration.
 class MainConfigNetworkHttp implements NetworkHttpConfig { ... }
@@ -35,12 +35,12 @@ class MainConfigNetworkHttpGetters implements NetworkHttpGetters { ... }
 class MainConfigNetworkHttpCallbacks implements NetworkHttpCallbacks { ... }
 ```
 
-- Invoke the `setup()` method before the root page displaying,
+- Invoking the `setup()` method before the root page displaying,
 ```dart
 await NetworkHttp.shared.setup(config: MainConfigNetworkHttp());
 ```
 
-- Invoke the `setupDeviceInfo()` method after user has granted the permission of `Device Info`, if you do not invoke this method, the `Device Info` will be passively initialized when the `NetworkHttp.shared.request()` method is called for the first time.
+- Optional step, invoking the `setupDeviceInfo()` method after user has granted the permission of `Device Info`, if you do not invoke this method, the `Device Info` will be passively initialized when the `NetworkHttp.shared.request()` method is called for the first time.
 ```dart
 onPrivacyPolicyConfirmed: () async {
   await NetworkHttp.shared.setupDeviceInfo();
@@ -49,7 +49,7 @@ onPrivacyPolicyConfirmed: () async {
 
 #### Request
 
-- Create your own API class and call the `NetworkHttp` APIs to send the requests,
+- Creating your own API class and call the `NetworkHttp's` APIs to send the request,
 ```dart
 final response = await NetworkHttp.shared.request('/api-service/module/method',
   {
