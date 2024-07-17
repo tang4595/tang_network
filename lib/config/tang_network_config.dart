@@ -18,6 +18,8 @@ abstract class NetworkHttpConfig {
 abstract class NetworkHttpBase {
   late int connectionTimeoutMs;
   late int receiveTimeoutMs;
+  late String? aesKey;
+  late String? aesIv;
 }
 
 /// Response json keys.
