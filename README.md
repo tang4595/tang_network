@@ -47,6 +47,8 @@ onPrivacyPolicyConfirmed: () async {
 }
 ```
 
+#### Request
+
 - Create your own API class and call the `NetworkHttp` APIs to send the requests,
 ```dart
 final response = await NetworkHttp.shared.request('/api-service/module/method',
