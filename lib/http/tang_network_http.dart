@@ -27,17 +27,23 @@ import 'package:encrypt/encrypt.dart' as ec;
 /// String encryptedParams = _encryptor.encrypt(jsonParams, iv: _iv).base64;
 /// String sig = md5enc(_encryptor.encrypt(encryptedParams, iv: _iv).base64);
 
+/// Request method.
 enum NetworkMethodType {
   post, get
 }
 
+/// Upload mode.
 enum FileUploadingType {
   formData, multipleFileData
 }
 
+/// Internal - key.
 const kURLExtraParamNeedsAutoSetupDeviceInfo = 'needsAutoSetupDeviceInfo';
+/// Internal - key.
 const kURLExtraParamValue = '1';
+/// Internal - AES.
 const _kDefaultAesKey = 'l[-a?.^aQvr_Ak-.';
+/// Internal - AES.
 const _kDefaultAesIv = '_a1]/-r`q-.|ghbn';
 
 class NetworkHttp {
@@ -87,12 +93,39 @@ class NetworkHttp {
 // Getter
 
 extension GettersEx on NetworkHttp {
+  /// Utils.
+  ///
+  /// Dio instance.
   Dio get dio => _dio;
+  /// Configuration instance.
   NetworkHttpConfig get config => _config;
+  /// EC instance.
   ec.Encrypter? get aesEncryptor => _encryptor;
+  /// EC instance.
   ec.IV? get aesIv => _iv;
+  /// Http response parser instance.
   NetworkHttpParser get parser => _parser;
+  /// The memory caches container.
   Map<String, String> get memoryCache => _memoryCache;
+
+  /// Base info.
+  ///
+  /// Version name.
+  String get version => _version ?? '';
+  /// Build number.
+  String get buildNo => _buildNo ?? '';
+  /// Language code.
+  String get language => _language ?? '';
+  /// Device unique ID.
+  String get deviceId => _deviceId ?? '';
+  /// Device model name.
+  String get deviceModel => _deviceModel ?? '';
+  /// Device brand, android only.
+  String get deviceBrand => _deviceBrand ?? '';
+  /// Device displaying name, android only.
+  String get deviceDisplay => _deviceDisplay ?? '';
+  /// Device hardware name, android only.
+  String get deviceHardware => _deviceHardware ?? '';
 }
 
 // Setup
