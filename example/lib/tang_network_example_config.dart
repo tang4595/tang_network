@@ -5,7 +5,7 @@ import 'package:dio/dio.dart';
 /// Configuration.
 class ExampleConfigNetworkHttp implements NetworkHttpConfig {
   @override
-  String apiDomain = 'https://www.apple.com/';
+  String apiDomain = 'https://sandbox.itunes.apple.com';
 
   @override
   NetworkHttpBase base = ExampleConfigNetworkHttpBase();
@@ -41,19 +41,46 @@ class ExampleConfigNetworkHttpBase implements NetworkHttpBase {
 /// Keys.
 class ExampleConfigNetworkHttpKeys implements NetworkHttpKeys {
   @override
+  late String requestHeaderSource = 'DSOURCE';
+
+  @override
+  late String requestHeaderDeviceId = 'DID';
+
+  @override
+  late String requestHeaderDeviceModel = 'DMODEL';
+
+  @override
+  late String requestHeaderDeviceBrand = 'DBRAND';
+
+  @override
+  late String requestHeaderDeviceDisplay = 'DDISPLAY';
+
+  @override
+  late String requestHeaderDeviceHardware = 'DHARDWARE';
+
+  @override
+  late String requestHeaderLanguage = 'LANG';
+
+  @override
+  late String requestHeaderBuildNo = 'BUILD';
+
+  @override
+  late String requestHeaderVersionName = 'version';
+
+  @override
   String requestFileKey = 'file';
 
   @override
   String requestFileSuffix = 'png';
 
   @override
-  String responseCode = 'code';
-
-  @override
   String responseData = 'data';
 
   @override
   String responseMsg = 'message';
+
+  @override
+  String responseCode = 'code';
 }
 
 /// Codes.
@@ -70,6 +97,47 @@ class ExampleConfigNetworkHttpCodes implements NetworkHttpCodes {
 
 /// Getters.
 class ExampleConfigNetworkHttpGetters implements NetworkHttpGetters {
+  @override
+  String? getDeviceId(NetworkHttp networkHttp) {
+    return null;
+  }
+
+  @override
+  String? getDeviceModel(NetworkHttp networkHttp) {
+    return null;
+  }
+
+  @override
+  String? getDeviceBrand(NetworkHttp networkHttp) {
+    return null;
+  }
+
+  @override
+  String? getDeviceDisplay(NetworkHttp networkHttp) {
+    return null;
+  }
+
+  @override
+  String? getDeviceHardware(NetworkHttp networkHttp) {
+    return null;
+  }
+
+  @override
+  String? getLanguage(NetworkHttp networkHttp) {
+    return null;
+  }
+
+  @override
+  String? getBuildNo(NetworkHttp networkHttp) {
+    return null;
+  }
+
+  @override
+  String? getVersionName(NetworkHttp networkHttp) {
+    return null;
+  }
+
+
   @override
   String? getUserToken(NetworkHttp networkHttp) {
     return 'SSUserActor.shared.token';

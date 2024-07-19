@@ -18,7 +18,7 @@ extension ParseEx on NetworkHttpParser {
   Future<Map<String, dynamic>> parseResponseBody({
     required String data,
     required Completer<Map<String, dynamic>> completer,
-    Response<Map<String, dynamic>>? response,
+    Response<dynamic>? response,
   }) {
     // String decryptResponseJson = encrypt.decrypt64(data, iv: iv);
     String decryptResponseJson = data;

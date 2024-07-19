@@ -1,6 +1,6 @@
 name: tang_network
 description: "The util of HTTP Network implements on the Flutter platform."
-version: 0.0.4
+version: 0.0.5
 homepage: https://github.com/tang4595/tang_network.git
 repository: https://github.com/tang4595/tang_network
 issue_tracker: https://github.com/tang4595/tang_network/issues
@@ -16,10 +16,6 @@ dependencies:
   pretty_dio_logger: ^1.3.1
   crypto: ^3.0.3
   encrypt: ^5.0.3
-  shared_preferences: ^2.2.2
-  package_info_plus: ^6.0.0
-  flutter_udid: ^3.0.0
-  device_info_plus: ^10.1.0
 
 dev_dependencies:
   flutter_test:

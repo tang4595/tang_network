@@ -1,8 +1,6 @@
 import 'dart:io';
 import 'dart:async';
 import 'package:dio/dio.dart';
-import 'package:device_info_plus/device_info_plus.dart';
-import 'package:flutter_udid/flutter_udid.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:tang_network/http/tang_network_http_download.dart';
 import 'package:tang_network/http/tang_network_http_parse.dart';
@@ -10,7 +8,6 @@ import 'package:tang_network/http/tang_network_http_request.dart';
 import 'package:tang_network/http/tang_network_http_upload.dart';
 import 'package:tang_network/config/tang_network_config.dart';
 import 'package:flutter/foundation.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:encrypt/encrypt.dart' as ec;
 
 /// * Proxy usage sample.
@@ -67,8 +64,8 @@ class NetworkHttp {
   ec.IV? _iv;
 
   /// Package info.
-  String? _version, _buildNo, _deviceId, _deviceModel, _deviceBrand,
-      _deviceDisplay, _deviceHardware;
+  String? _version, _buildNo, _language,
+      _deviceId, _deviceModel, _deviceBrand, _deviceDisplay, _deviceHardware;
 
   /// Cache.
   /// key : the encrypted 'data of response map'.
@@ -90,21 +87,12 @@ class NetworkHttp {
 // Getter
 
 extension GettersEx on NetworkHttp {
-  /// Utils.
   Dio get dio => _dio;
   NetworkHttpConfig get config => _config;
   ec.Encrypter? get aesEncryptor => _encryptor;
   ec.IV? get aesIv => _iv;
   NetworkHttpParser get parser => _parser;
   Map<String, String> get memoryCache => _memoryCache;
-  /// Keys.
-  String get version => _version ?? '';
-  String get buildNo => _buildNo ?? '';
-  String get deviceId => _deviceId ?? '';
-  String get deviceModel => _deviceModel ?? 'Simulator';
-  String get deviceBrand => _deviceBrand ?? '';
-  String get deviceDisplay => _deviceDisplay ?? '';
-  String get deviceHardware => _deviceHardware ?? '';
 }
 
 // Setup
@@ -152,16 +140,15 @@ extension SetupEx on NetworkHttp {
         await _setupDeviceInfoIfNeeded(options.headers);
         final token = _config.getters?.getUserToken(this) ?? '';
         options.headers[HttpHeaders.authorizationHeader] = token;
-        options.headers['DID'] = _deviceId;
-        options.headers['DSOURCE'] = (Platform.isIOS ? 'ios':'android');
-        options.headers['DMODEL'] = _deviceModel;
-        options.headers['DBRAND'] = _deviceBrand;
-        options.headers['DDISPLAY'] = _deviceDisplay;
-        options.headers['DHARDWARE'] = _deviceHardware;
-        options.headers['LANG'] = 'zh';
-        options.headers['APP-VERSION'] = _version;
-        options.headers['APP-BUILD'] = _buildNo;
-        options.headers['version'] = _version;
+        options.headers[_config.keys.requestHeaderSource] = Platform.operatingSystem;
+        options.headers[_config.keys.requestHeaderDeviceId] = _deviceId;
+        options.headers[_config.keys.requestHeaderDeviceModel] = _deviceModel;
+        options.headers[_config.keys.requestHeaderDeviceBrand] = _deviceBrand;
+        options.headers[_config.keys.requestHeaderDeviceDisplay] = _deviceDisplay;
+        options.headers[_config.keys.requestHeaderDeviceHardware] = _deviceHardware;
+        options.headers[_config.keys.requestHeaderLanguage] = _language;
+        options.headers[_config.keys.requestHeaderBuildNo] = _buildNo;
+        options.headers[_config.keys.requestHeaderVersionName] = _version;
         handler.next(options);
       }, onResponse: (response, handler) {
         handler.next(response);
@@ -185,21 +172,14 @@ extension SetupEx on NetworkHttp {
   _setupDeviceInfoIfNeeded(Map<String, dynamic> headers) async {
     if (_deviceModel != null && _deviceId != null && _version != null) return;
     if (headers[kURLExtraParamNeedsAutoSetupDeviceInfo] != kURLExtraParamValue) return;
-    final platform = await PackageInfo.fromPlatform();
-    final dip = DeviceInfoPlugin();
-    final dm = Platform.isIOS
-        ? (await dip.iosInfo).utsname.machine
-        : (await dip.androidInfo).model;
-    final brand = Platform.isIOS ? 'Apple' : (await dip.androidInfo).brand;
-    final display = Platform.isIOS ? 'Apple' : (await dip.androidInfo).display;
-    final hardware = Platform.isIOS ? 'Apple' : (await dip.androidInfo).hardware;
-    _version = platform.version;
-    _buildNo = platform.buildNumber;
-    _deviceId ??= await FlutterUdid.udid;
-    _deviceModel = dm;
-    _deviceBrand = brand;
-    _deviceDisplay = display;
-    _deviceHardware = hardware;
+    _version = _config.getters?.getVersionName(this) ?? '';
+    _buildNo = _config.getters?.getBuildNo(this) ?? '';
+    _language = _config.getters?.getLanguage(this) ?? '';
+    _deviceId = _config.getters?.getDeviceId(this) ?? '';
+    _deviceModel = _config.getters?.getDeviceModel(this) ?? '';
+    _deviceBrand = _config.getters?.getDeviceBrand(this) ?? '';
+    _deviceDisplay = _config.getters?.getDeviceDisplay(this) ?? '';
+    _deviceHardware = _config.getters?.getDeviceHardware(this) ?? '';
   }
 }
 
@@ -207,23 +187,27 @@ extension SetupEx on NetworkHttp {
 
 extension RequestEx on NetworkHttp {
 
-  /// POST/Get请求.
+  /// Http request.
   ///
   /// - [url] .
   /// - [params] The MapObj of HTTP Body.
-  /// - [method] `NetworkMethodType`
+  /// - [method] `NetworkMethodType`.
+  /// - [isRawResponse] Returning the response raw data directly.
   /// - [isSimpleResponse] The 'data' could be null or SimpleType
   /// at the response value.
+  /// - [isNeedAutoSetupDeviceInfo] Automatic invoking
+  /// the `_setupDeviceInfoIfNeeded`.
   /// - [ignoreErrorCodes] The response codes that will not be recognize.
   Future<Map<String, dynamic>> request(
       String url, Map<String, dynamic> params, {
         required NetworkMethodType method,
         bool absoluteUrl = false,
+        bool isRawResponse = false,
         bool isSimpleResponse = false,
-        bool needsAutoSetupDeviceInfo = true,
+        bool isNeedAutoSetupDeviceInfo = true,
         bool isUseMemoryCache = false,
-        Map<String, String>? customHeaders,
         String? cacheKey,
+        Map<String, String>? customHeaders,
         List<String>? ignoreErrorCodes,
       }) async {
     return _request.request(
@@ -231,8 +215,9 @@ extension RequestEx on NetworkHttp {
       params,
       method: method,
       absoluteUrl: absoluteUrl,
+      isRawResponse: isRawResponse,
       isSimpleResponse: isSimpleResponse,
-      needsAutoSetupDeviceInfo: needsAutoSetupDeviceInfo,
+      isNeedAutoSetupDeviceInfo: isNeedAutoSetupDeviceInfo,
       isUseMemoryCache: isUseMemoryCache,
       customHeaders: customHeaders,
       cacheKey: cacheKey,

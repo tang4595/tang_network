@@ -24,11 +24,22 @@ abstract class NetworkHttpBase {
 
 /// Response json keys.
 abstract class NetworkHttpKeys {
+  /// Request.
+  late String requestHeaderSource;
+  late String requestHeaderDeviceId;
+  late String requestHeaderDeviceModel;
+  late String requestHeaderDeviceBrand;
+  late String requestHeaderDeviceDisplay;
+  late String requestHeaderDeviceHardware;
+  late String requestHeaderLanguage;
+  late String requestHeaderBuildNo;
+  late String requestHeaderVersionName;
+  late String requestFileKey;
+  late String requestFileSuffix;
+  /// Response.
   late String responseCode;
   late String responseMsg;
   late String responseData;
-  late String requestFileKey;
-  late String requestFileSuffix;
 }
 
 /// Response codes;
@@ -40,6 +51,16 @@ abstract class NetworkHttpCodes {
 
 /// Getter.
 abstract class NetworkHttpGetters {
+  /// Basic.
+  String? getDeviceId(NetworkHttp networkHttp);
+  String? getDeviceModel(NetworkHttp networkHttp);
+  String? getDeviceBrand(NetworkHttp networkHttp);
+  String? getDeviceDisplay(NetworkHttp networkHttp);
+  String? getDeviceHardware(NetworkHttp networkHttp);
+  String? getLanguage(NetworkHttp networkHttp);
+  String? getBuildNo(NetworkHttp networkHttp);
+  String? getVersionName(NetworkHttp networkHttp);
+  /// User token.
   String? getUserToken(NetworkHttp networkHttp);
 }
 

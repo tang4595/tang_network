@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:tang_network/http/tang_network_http.dart';
 import 'package:tang_network/http/tang_network_http_parse.dart';
-import 'package:tang_network/util/tang_network_util.dart';
 
 class NetworkHttpRequest {
   final NetworkHttp http;
@@ -12,23 +11,27 @@ class NetworkHttpRequest {
 
 extension RequestsEx on NetworkHttpRequest {
 
-  /// POST/Get请求.
+  /// Http request.
   ///
   /// - [url] .
   /// - [params] The MapObj of HTTP Body.
-  /// - [method] `NetworkMethodType`
+  /// - [method] `NetworkMethodType`.
+  /// - [isRawResponse] Returning the response raw data directly.
   /// - [isSimpleResponse] The 'data' could be null or SimpleType
   /// at the response value.
+  /// - [isNeedAutoSetupDeviceInfo] Automatic invoking
+  /// the `_setupDeviceInfoIfNeeded`.
   /// - [ignoreErrorCodes] The response codes that will not be recognize.
   Future<Map<String, dynamic>> request(
       String url, Map<String, dynamic> params, {
         required NetworkMethodType method,
         bool absoluteUrl = false,
+        bool isRawResponse = false,
         bool isSimpleResponse = false,
-        bool needsAutoSetupDeviceInfo = true,
+        bool isNeedAutoSetupDeviceInfo = true,
         bool isUseMemoryCache = false,
-        Map<String, String>? customHeaders,
         String? cacheKey,
+        Map<String, String>? customHeaders,
         List<String>? ignoreErrorCodes,
       }) async {
     final completer = Completer<Map<String, dynamic>>();
@@ -56,13 +59,13 @@ extension RequestsEx on NetworkHttpRequest {
       HttpHeaders.contentTypeHeader: 'application/json;charset=UTF-8',
     };
     headers.addAll(customHeaders ?? {});
-    if (needsAutoSetupDeviceInfo) {
+    if (isNeedAutoSetupDeviceInfo) {
       headers[kURLExtraParamNeedsAutoSetupDeviceInfo] = kURLExtraParamValue;
     }
     final options = Options(headers: headers);
 
     /// Do request.
-    Response<Map<String, dynamic>> response;
+    Response<dynamic> response;
     switch (method) {
       case NetworkMethodType.get:
         response = await http.dio.get(
@@ -91,13 +94,18 @@ extension RequestsEx on NetworkHttpRequest {
         {"error": 'Error data: ${response.data}'},
       );
     }
+    if (isRawResponse) {
+      return Future<Map<String, dynamic>>.value(
+        {"value": '${response.data}'},
+      );
+    }
     if (response.data is! Map<String, dynamic>) {
       return Future<Map<String, dynamic>>.value(
         {"error": 'Error data format: ${response.data}'},
       );
     }
     if (isSimpleResponse) {
-      _handleErrorResponse(response.data ?? {});
+      _processingResponseError(response.data ?? {});
       return Future<Map<String, dynamic>>.value(response.data);
     }
 
@@ -120,7 +128,7 @@ extension RequestsEx on NetworkHttpRequest {
       response: response,
       completer: completer,
     );
-    _handleErrorResponse(plainResponse, ignoreErrorCodes: ignoreErrorCodes);
+    _processingResponseError(plainResponse, ignoreErrorCodes: ignoreErrorCodes);
     return plainResponse;
   }
 }
@@ -128,7 +136,7 @@ extension RequestsEx on NetworkHttpRequest {
 extension ErrorEx on NetworkHttpRequest {
   
   /// Error handling.
-  _handleErrorResponse(Map<String, dynamic> response, {
+  _processingResponseError(Map<String, dynamic> response, {
     List<String>? ignoreErrorCodes,
   }) {
     var code = response[http.config.keys.responseCode];

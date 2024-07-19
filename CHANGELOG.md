@@ -14,3 +14,9 @@
 
 * Update README.
 * Fix bug.
+
+## 0.0.5
+
+* Add example project.
+* Remove unnecessary dependencies.
+* Fix bug.
