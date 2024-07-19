@@ -1,3 +1,7 @@
+## 0.0.7
+
+* Update public getters.
+
 ## 0.0.6
 
 * Add public getters.
