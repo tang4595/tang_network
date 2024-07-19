@@ -1,3 +1,7 @@
+## 0.0.6
+
+* Add public getters.
+
 ## 0.0.5
 
 * Add example project.
