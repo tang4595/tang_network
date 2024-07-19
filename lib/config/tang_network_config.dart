@@ -52,14 +52,14 @@ abstract class NetworkHttpCodes {
 /// Getter.
 abstract class NetworkHttpGetters {
   /// Basic.
-  String? getDeviceId(NetworkHttp networkHttp);
-  String? getDeviceModel(NetworkHttp networkHttp);
-  String? getDeviceBrand(NetworkHttp networkHttp);
-  String? getDeviceDisplay(NetworkHttp networkHttp);
-  String? getDeviceHardware(NetworkHttp networkHttp);
-  String? getLanguage(NetworkHttp networkHttp);
-  String? getBuildNo(NetworkHttp networkHttp);
-  String? getVersionName(NetworkHttp networkHttp);
+  Future<String?> getDeviceId(NetworkHttp networkHttp);
+  Future<String?> getDeviceModel(NetworkHttp networkHttp);
+  Future<String?> getDeviceBrand(NetworkHttp networkHttp);
+  Future<String?> getDeviceDisplay(NetworkHttp networkHttp);
+  Future<String?> getDeviceHardware(NetworkHttp networkHttp);
+  Future<String?> getLanguage(NetworkHttp networkHttp);
+  Future<String?> getBuildNo(NetworkHttp networkHttp);
+  Future<String?> getVersionName(NetworkHttp networkHttp);
   /// User token.
   String? getUserToken(NetworkHttp networkHttp);
 }

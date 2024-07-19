@@ -205,14 +205,14 @@ extension SetupEx on NetworkHttp {
   _setupDeviceInfoIfNeeded(Map<String, dynamic> headers) async {
     if (_deviceModel != null && _deviceId != null && _version != null) return;
     if (headers[kURLExtraParamNeedsAutoSetupDeviceInfo] != kURLExtraParamValue) return;
-    _version = _config.getters?.getVersionName(this) ?? '';
-    _buildNo = _config.getters?.getBuildNo(this) ?? '';
-    _language = _config.getters?.getLanguage(this) ?? '';
-    _deviceId = _config.getters?.getDeviceId(this) ?? '';
-    _deviceModel = _config.getters?.getDeviceModel(this) ?? '';
-    _deviceBrand = _config.getters?.getDeviceBrand(this) ?? '';
-    _deviceDisplay = _config.getters?.getDeviceDisplay(this) ?? '';
-    _deviceHardware = _config.getters?.getDeviceHardware(this) ?? '';
+    _version = await _config.getters?.getVersionName(this) ?? '';
+    _buildNo = await _config.getters?.getBuildNo(this) ?? '';
+    _language = await _config.getters?.getLanguage(this) ?? '';
+    _deviceId = await _config.getters?.getDeviceId(this) ?? '';
+    _deviceModel = await _config.getters?.getDeviceModel(this) ?? '';
+    _deviceBrand = await _config.getters?.getDeviceBrand(this) ?? '';
+    _deviceDisplay = await _config.getters?.getDeviceDisplay(this) ?? '';
+    _deviceHardware = await _config.getters?.getDeviceHardware(this) ?? '';
   }
 }
 

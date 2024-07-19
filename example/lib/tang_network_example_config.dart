@@ -98,43 +98,43 @@ class ExampleConfigNetworkHttpCodes implements NetworkHttpCodes {
 /// Getters.
 class ExampleConfigNetworkHttpGetters implements NetworkHttpGetters {
   @override
-  String? getDeviceId(NetworkHttp networkHttp) {
-    return null;
+  Future<String?> getDeviceId(NetworkHttp networkHttp) {
+    return Future.value(null);
   }
 
   @override
-  String? getDeviceModel(NetworkHttp networkHttp) {
-    return null;
+  Future<String?> getDeviceModel(NetworkHttp networkHttp) {
+    return Future.value(null);
   }
 
   @override
-  String? getDeviceBrand(NetworkHttp networkHttp) {
-    return null;
+  Future<String?> getDeviceBrand(NetworkHttp networkHttp) {
+    return Future.value(null);
   }
 
   @override
-  String? getDeviceDisplay(NetworkHttp networkHttp) {
-    return null;
+  Future<String?> getDeviceDisplay(NetworkHttp networkHttp) {
+    return Future.value(null);
   }
 
   @override
-  String? getDeviceHardware(NetworkHttp networkHttp) {
-    return null;
+  Future<String?> getDeviceHardware(NetworkHttp networkHttp) {
+    return Future.value(null);
   }
 
   @override
-  String? getLanguage(NetworkHttp networkHttp) {
-    return null;
+  Future<String?> getLanguage(NetworkHttp networkHttp) {
+    return Future.value(null);
   }
 
   @override
-  String? getBuildNo(NetworkHttp networkHttp) {
-    return null;
+  Future<String?> getBuildNo(NetworkHttp networkHttp) {
+    return Future.value(null);
   }
 
   @override
-  String? getVersionName(NetworkHttp networkHttp) {
-    return null;
+  Future<String?> getVersionName(NetworkHttp networkHttp) {
+    return Future.value(null);
   }
 
 
