@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:tang_network/http/tang_network_http.dart';
 import 'package:tang_network/http/tang_network_http_parse.dart';
+import 'package:tang_network/util/tang_network_util.dart';
 
 class NetworkHttpRequest {
   final NetworkHttp http;
@@ -111,7 +112,8 @@ extension RequestsEx on NetworkHttpRequest {
 
     dynamic data = response.data?[http.config.keys.responseData];
     if (data is! String) {
-      data = response.data?.toJsonStr() ?? '{}';
+      final Map<String, dynamic>? responseJson = response.data;
+      data = responseJson?.toJsonStr() ?? '{}';
     }
 
     /// Cache if needed.
